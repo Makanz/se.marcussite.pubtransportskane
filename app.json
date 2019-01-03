@@ -1,0 +1,83 @@
+{
+  "id": "se.marcussite.skanetrafiken",
+  "version": "0.0.1",
+  "compatibility": ">=1.5.0",
+  "sdk": 2,
+  "name": {
+    "en": "Skånetrafiken"
+  },
+  "description": {
+    "en": "Public transport information in Skåne, Sweden"
+  },
+  "category": [
+    "internet"
+  ],
+  "permissions": [],
+  "images": {
+    "large": "/assets/images/large.png",
+    "small": "/assets/images/small.png"
+  },
+  "author": {
+    "name": "Marcus Alsterfjord",
+    "email": "marcus@marcussite.se"
+  },
+  "flow":{
+    "triggers":[],
+    "conditions":[{
+      "id":"skanetrafiken_find_next_departure",
+      "title": {
+          "en":"Find departure time",
+          "nl":"Vind vertrektijd"
+      },
+      "args":[{
+         "name":"station",
+         "type":"autocomplete",
+        "placeholder": {
+            "en": "Search station..."
+        }
+      },
+      {
+          "name": "type",
+          "type": "dropdown",
+          "values":[
+              {
+                  "id":"train",
+                  "label":{
+                      "en": "Train",
+                      "nl": "Trein"
+                  }
+              },
+              {
+                  "id":"bus",
+                  "label":{
+                      "en": "Bus",
+                      "nl": "Bus"
+                  }
+              },
+              {
+                  "id":"tram",
+                  "label":{
+                      "en": "Tram",
+                      "nl": "Tram"
+                  }
+              },
+              {
+                  "id":"subway",
+                  "label":{
+                      "en": "Subway",
+                      "nl": "Metro"
+                  }
+              },
+              {
+                  "id":"ferry",
+                  "label":{
+                      "en": "Ferry",
+                      "nl": "Veerboot"
+                  }
+              }
+          ]
+      }]
+    }],
+    "actions":[]
+  }
+}
