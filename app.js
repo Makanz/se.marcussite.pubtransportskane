@@ -1,35 +1,91 @@
 'use strict';
 
 const Homey = require('homey');
-const message = "Notismeddelande";
-const cronName = "busUpdateSkane"
-const cronInterval = "0 */5 * * * *";
+
+const https = require('https');
+
+const trigger_departure = "skanetransport_trigger_next_departure";
+const action_departure = "skanetransport_find_next_departure";
 
 class Skanetrafiken extends Homey.App {
 	
 	onInit() {
 		this.log('Skanetrafiken is running...')
+		
+		// Register FlowCardTrigger
+		let departureTrigger = new Homey.FlowCardTrigger(trigger_departure).register();
 
-		//Homey.manager('flow').on(CONDITIONS_find_next_departure,this.getDepartures.bind(this));
-		//Homey.manager('flow').on(CONDITIONS_find_next_departure+"."+ARGS_STATIONNAME+".autocomplete",this.onFindStation.bind(this))
+		let tokens = {
+			'next_departure': '21:50',
+			'route_name': '222',
+			'delayed': true
+		}
 
-		new Homey.FlowCardCondition('skanetrafiken_find_next_departure')
-			.register()
-			.registerRunListener(( args, state ) => {
+		// Register FlowCardAction
+		let departureAction = new Homey.FlowCardAction(action_departure);
 
-				this.log(`skanetrafiken_find_next_departure ${args} ${state}`)
-				return Promise.resolve( true ); // return true or false
+		departureAction
+		.register()
+		.registerRunListener((args) => {
+			// Find route and get next departure
+			this.log(`Find route and get next departure: ${args.stationFrom.name} - ${args.stationTo.name}`);
 
+			// Trigger flowcard
+			departureTrigger.trigger( tokens )
+			.catch( this.error )
+
+			return Promise.resolve(true);
+		})
+
+		// Get arguments from "Station from" on action card
+		departureAction
+		.getArgument('stationFrom')
+		.registerAutocompleteListener(( query, args ) => {
+				this.log(query)
+
+				if(query.length >= 3) {
+
+					return new Promise(function(resolve, reject) {
+						https.get('https://reqres.in/api/users/2', (resp) => {
+							let data = '';
+							// A chunk of data has been recieved.
+							resp.on('data', (chunk) => {
+								data += chunk;
+							});
+
+							// The whole response has been received. Print out the result.
+							resp.on('end', () => {
+								console.log("End", JSON.parse(data));
+								
+								resolve([
+									{
+										image: 'https://path.to/icon.png',
+										name: 'Gruvgatan, Höganäs',
+										description: 'Optional description',
+										some_value_for_myself: 'that i will recognize when fired, such as an ID'
+									}
+								]);
+							});
+
+						}).on("error", (err) => {
+							console.log("Error: " + err.message);
+							reject(err);
+						});
+					});
+				}
 			})
-			.getArgument('station')
-			.registerAutocompleteListener(( query, args ) => {
+
+		// Get arguments from "Station to" on action card
+		departureAction
+		.getArgument('stationTo')
+		.registerAutocompleteListener(( query, args ) => {
 				this.log(query)
 				let returnData = [];
 				if(query.length >= 3) {
 					returnData = [
 						{
-							icon: 'https://path.to/icon.svg', // or use "image: 'https://path.to/icon.png'" for non-svg icons.
-							name: 'Item name',
+							image: 'https://path.to/icon.png',
+							name: 'Sundstorget',
 							description: 'Optional description',
 							some_value_for_myself: 'that i will recognize when fired, such as an ID'
 						}
@@ -38,32 +94,6 @@ class Skanetrafiken extends Homey.App {
 				return Promise.resolve(returnData);
 			})
 
-		// Register crontask
-		Homey.ManagerCron.getTask(cronName)
-			.then(task => {
-				this.log("The task exists: " + cronName);
-				task.on('run', () => this.updateData());
-			})
-			.catch(err => {
-				if (err.code == 404) {
-					this.log("The task has not been registered yet, registering task: " + cronName);
-					Homey.ManagerCron.registerTask(cronName, cronInterval,null)
-						.then(task => {
-							task.on('run', () => this.updateData());
-						})
-						.catch(err => {
-							this.log(`problem with registering cronjob: ${err.message}`);
-						});
-				} else {
-					this.log(`other cron error: ${err.message}`);
-				}
-			});
-
-		// Run on unload
-		Homey
-			.on('unload', () => {
-				Homey.ManagerCron.unregisterTask(cronName);
-			});
 	}
 
 	getDepartures() {
@@ -73,12 +103,6 @@ class Skanetrafiken extends Homey.App {
 	onFindStation() {
 		this.log("onFindStation");
 	}
-
-	// Update data from API
-	updateData() {
-		this.log("Update data!")
-	}
-
 }
 
 module.exports = Skanetrafiken;

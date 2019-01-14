@@ -4,7 +4,7 @@
   "compatibility": ">=1.5.0",
   "sdk": 2,
   "name": {
-    "en": "Skånetrafiken"
+    "en": "Skånetrafiken - Public transport information"
   },
   "description": {
     "en": "Public transport information in Skåne, Sweden"
@@ -21,63 +21,67 @@
     "name": "Marcus Alsterfjord",
     "email": "marcus@marcussite.se"
   },
-  "flow":{
-    "triggers":[],
-    "conditions":[{
-      "id":"skanetrafiken_find_next_departure",
-      "title": {
-          "en":"Find departure time",
-          "nl":"Vind vertrektijd"
-      },
-      "args":[{
-         "name":"station",
-         "type":"autocomplete",
-        "placeholder": {
-            "en": "Search station..."
-        }
-      },
+  "flow": {
+    "triggers": [
       {
-          "name": "type",
-          "type": "dropdown",
-          "values":[
-              {
-                  "id":"train",
-                  "label":{
-                      "en": "Train",
-                      "nl": "Trein"
-                  }
-              },
-              {
-                  "id":"bus",
-                  "label":{
-                      "en": "Bus",
-                      "nl": "Bus"
-                  }
-              },
-              {
-                  "id":"tram",
-                  "label":{
-                      "en": "Tram",
-                      "nl": "Tram"
-                  }
-              },
-              {
-                  "id":"subway",
-                  "label":{
-                      "en": "Subway",
-                      "nl": "Metro"
-                  }
-              },
-              {
-                  "id":"ferry",
-                  "label":{
-                      "en": "Ferry",
-                      "nl": "Veerboot"
-                  }
-              }
-          ]
-      }]
-    }],
-    "actions":[]
+        "id": "skanetransport_trigger_next_departure",
+        "title": {
+          "en": "Triggred departure time",
+          "nl": "Vind vertrektijd"
+        },
+        "tokens": [
+          {
+            "name": "next_departure",
+            "type": "string",
+            "title": {
+              "en": "Time"
+            },
+            "example": "10:00"
+          },
+          {
+            "name": "route_name",
+            "type": "string",
+            "title": {
+              "en": "Name"
+            },
+            "example": "Bus 219"
+          },
+          {
+            "name": "delayed",
+            "type": "boolean",
+            "title": {
+              "en": "Delayed?"
+            },
+            "example": "true/false"
+          }
+        ]
+      }
+    ],
+    "conditions": [],
+    "actions": [
+      {
+        "id": "skanetransport_find_next_departure",
+        "title": {
+          "en": "Find departure time",
+          "nl": "Vind vertrektijd"
+        },
+        "args": [
+          {
+            "name": "stationFrom",
+            "type": "autocomplete",
+            "placeholder": {
+              "en": "From station..."
+            }
+          },
+          {
+            "name": "stationTo",
+            "type": "autocomplete",
+            "placeholder": {
+              "en": "To station..."
+            }
+          }
+        ]
+      }
+    ]
   }
 }
