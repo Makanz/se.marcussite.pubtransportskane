@@ -1,0 +1,24 @@
+{
+  "name": "se.marcussite.skanetrafiken",
+  "version": "0.0.1",
+  "description": "More info later...",
+  "main": "app.js",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "xml-js": "^1.6.9"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Makanz/se.marcussite.skanetrafiken.git"
+  },
+  "author": "",
+  "license": "GNU",
+  "bugs": {
+    "url": "https://github.com/Makanz/se.marcussite.skanetrafiken/issues"
+  },
+  "homepage": "https://github.com/Makanz/se.marcussite.skanetrafiken#readme"
+}
