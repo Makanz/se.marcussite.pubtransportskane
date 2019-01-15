@@ -2,7 +2,8 @@
 
 const Homey = require('homey');
 
-const https = require('https');
+const axios = require('axios');
+const convert = require('xml-js');
 
 const trigger_departure = "skanetransport_trigger_next_departure";
 const action_departure = "skanetransport_find_next_departure";
@@ -28,7 +29,7 @@ class Skanetrafiken extends Homey.App {
 		.register()
 		.registerRunListener((args) => {
 			// Find route and get next departure
-			this.log(`Find route and get next departure: ${args.stationFrom.name} - ${args.stationTo.name}`);
+			this.log(`Find route and get next departure: ${args.stationFrom.name} | ${args.stationFrom.id} - ${args.stationTo.name} | ${args.stationTo.id}`);
 
 			// Trigger flowcard
 			departureTrigger.trigger( tokens )
@@ -44,34 +45,7 @@ class Skanetrafiken extends Homey.App {
 				this.log(query)
 
 				if(query.length >= 3) {
-
-					return new Promise(function(resolve, reject) {
-						https.get('https://reqres.in/api/users/2', (resp) => {
-							let data = '';
-							// A chunk of data has been recieved.
-							resp.on('data', (chunk) => {
-								data += chunk;
-							});
-
-							// The whole response has been received. Print out the result.
-							resp.on('end', () => {
-								console.log("End", JSON.parse(data));
-								
-								resolve([
-									{
-										image: 'https://path.to/icon.png',
-										name: 'Gruvgatan, Höganäs',
-										description: 'Optional description',
-										some_value_for_myself: 'that i will recognize when fired, such as an ID'
-									}
-								]);
-							});
-
-						}).on("error", (err) => {
-							console.log("Error: " + err.message);
-							reject(err);
-						});
-					});
+					return this.stationAutoComplete(query);
 				}
 			})
 
@@ -80,20 +54,44 @@ class Skanetrafiken extends Homey.App {
 		.getArgument('stationTo')
 		.registerAutocompleteListener(( query, args ) => {
 				this.log(query)
-				let returnData = [];
+
 				if(query.length >= 3) {
-					returnData = [
-						{
-							image: 'https://path.to/icon.png',
-							name: 'Sundstorget',
-							description: 'Optional description',
-							some_value_for_myself: 'that i will recognize when fired, such as an ID'
-						}
-					];
+					return this.stationAutoComplete(query);
 				}
-				return Promise.resolve(returnData);
 			})
 
+	}
+
+	stationAutoComplete(query) {
+		return new Promise((resolve, reject) => {
+			axios.get('http://www.labs.skanetrafiken.se/v2.2/querystation.asp?inpPointfr=' + encodeURIComponent(query))
+			.then(response => {
+			let xml = response.data;
+			var json = JSON.parse(convert.xml2json(xml, {
+				compact: true,
+				spaces: 4
+			}));
+			
+			let searchResult = json["soap:Envelope"]["soap:Body"].GetStartEndPointResponse.GetStartEndPointResult.StartPoints.Point;
+		
+			if(searchResult.length > 0) {
+				searchResult = searchResult
+									.map((busStop) => {
+										return {
+											name: busStop.Name._text,
+											id: busStop.Id._text
+										}
+									});
+				resolve(searchResult);
+			} else {
+				resolve([{name: "Nothing found!"}]);
+			}
+			
+			})
+			.catch(error => {
+				reject(error);
+			});	
+		});
 	}
 
 	getDepartures() {
@@ -103,6 +101,7 @@ class Skanetrafiken extends Homey.App {
 	onFindStation() {
 		this.log("onFindStation");
 	}
+
 }
 
 module.exports = Skanetrafiken;
