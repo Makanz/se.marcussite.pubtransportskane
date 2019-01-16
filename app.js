@@ -16,12 +16,6 @@ class Skanetrafiken extends Homey.App {
 		// Register FlowCardTrigger
 		let departureTrigger = new Homey.FlowCardTrigger(trigger_departure).register();
 
-		let tokens = {
-			'next_departure': '21:50',
-			'route_name': '222',
-			'delayed': true
-		}
-
 		// Register FlowCardAction
 		let departureAction = new Homey.FlowCardAction(action_departure);
 
@@ -31,11 +25,7 @@ class Skanetrafiken extends Homey.App {
 			// Find route and get next departure
 			this.log(`Find route and get next departure: ${args.stationFrom.name} | ${args.stationFrom.id} - ${args.stationTo.name} | ${args.stationTo.id}`);
 
-			// Trigger flowcard
-			departureTrigger.trigger( tokens )
-			.catch( this.error )
-
-			return Promise.resolve(true);
+			return this.getNextDeparture(args.stationFrom, args.stationTo);
 		})
 
 		// Get arguments from "Station from" on action card
@@ -94,14 +84,47 @@ class Skanetrafiken extends Homey.App {
 		});
 	}
 
-	getDepartures() {
-		this.log("getDepartures");
-	}
+	getNextDeparture(from, to) {
+		return new Promise((resolve, reject) => {
+			// let tokens = {};    
+			let date = new Date(new Date().setMinutes( new Date().getMinutes() - 10 ));
+			date = date.toISOString().substr(0, 16).replace('T', '%20');
+			console.log("getNextDeparture");
+			axios.get('http://www.labs.skanetrafiken.se/v2.2/resultspage.asp?cmdaction=next&selPointFr='+from.name+'|'+from.id+'|0&selPointTo='+to.name+'|'+to.id+'|0&LastStart=' + date)
+				.then(response => {
+					let xml = response.data;
+					var json = JSON.parse(convert.xml2json(xml, {
+						compact: true,
+						spaces: 4
+					}));
+			
+					let searchResult = json["soap:Envelope"]["soap:Body"].GetJourneyResponse.GetJourneyResult.Journeys.Journey;
+			
+					let route = searchResult[0].RouteLinks.RouteLink[0];
+			
+					let diffTime = (route.RealTime.RealTimeInfo !== undefined && route.RealTime.RealTimeInfo.DepTimeDeviation._text !== '') ? route.RealTime.RealTimeInfo.DepTimeDeviation._text : 0;
 
-	onFindStation() {
-		this.log("onFindStation");
-	}
+					let time = new Date(new Date(route.DepDateTime._text).getTime() + (-(new Date().getTimezoneOffset()) + parseInt(diffTime)) * 60000);
+			
+					let tokens = {
+						route_name: route.Line.Name._text,
+						next_departure: time.toLocaleTimeString().substring(0,5),
+						delayed: (diffTime > 0)
+					}
 
+					console.log("Tokens", tokens);
+					console.log("departureTrigger", departureTrigger);
+					// Trigger flowcard
+					departureTrigger.trigger( tokens )
+					.catch( this.error )
+
+					resolve(true);
+				})
+				.catch(error => {
+					reject(false);
+				});
+		});
+	}
 }
 
 module.exports = Skanetrafiken;
