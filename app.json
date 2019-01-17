@@ -1,5 +1,5 @@
 {
-  "id": "se.marcussite.skanetrafiken",
+  "id": "se.marcussite.pubtransportskane",
   "version": "0.0.2",
   "compatibility": ">=1.5.0",
   "sdk": 2,
@@ -26,8 +26,7 @@
       {
         "id": "skanetransport_trigger_next_departure",
         "title": {
-          "en": "Triggred departure time",
-          "nl": "Vind vertrektijd"
+          "en": "Triggered departure"
         },
         "tokens": [
           {
@@ -62,8 +61,7 @@
       {
         "id": "skanetransport_find_next_departure",
         "title": {
-          "en": "Find departure time",
-          "nl": "Vind vertrektijd"
+          "en": "Find departure time"
         },
         "args": [
           {

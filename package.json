@@ -1,7 +1,7 @@
 {
-  "name": "se.marcussite.pubtransskane",
+  "name": "se.marcussite.pubtransportskane",
   "version": "0.0.2",
-  "description": "More info later...",
+  "description": "Public transport Skåne, Sweden",
   "main": "app.js",
   "dependencies": {
     "axios": "^0.18.0",
@@ -13,12 +13,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Makanz/se.marcussite.skanetrafiken.git"
+    "url": "git+https://github.com/Makanz/se.marcussite.pubtransportskane.git"
   },
   "author": "",
   "license": "GNU",
   "bugs": {
-    "url": "https://github.com/Makanz/se.marcussite.skanetrafiken/issues"
+    "url": "https://github.com/Makanz/se.marcussite.pubtransportskane/issues"
   },
-  "homepage": "https://github.com/Makanz/se.marcussite.skanetrafiken#readme"
+  "homepage": "https://github.com/Makanz/se.marcussite.pubtransportskane#readme"
 }
