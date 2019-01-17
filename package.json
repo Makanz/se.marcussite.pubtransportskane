@@ -1,6 +1,6 @@
 {
-  "name": "se.marcussite.skanetrafiken",
-  "version": "0.0.1",
+  "name": "se.marcussite.pubtransskane",
+  "version": "0.0.2",
   "description": "More info later...",
   "main": "app.js",
   "dependencies": {

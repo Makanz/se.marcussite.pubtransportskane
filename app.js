@@ -7,6 +7,7 @@ const convert = require('xml-js');
 
 const trigger_departure = "skanetransport_trigger_next_departure";
 const action_departure = "skanetransport_find_next_departure";
+let departureTrigger = "";
 
 class Skanetrafiken extends Homey.App {
 	
@@ -14,7 +15,7 @@ class Skanetrafiken extends Homey.App {
 		this.log('Skanetrafiken is running...')
 		
 		// Register FlowCardTrigger
-		let departureTrigger = new Homey.FlowCardTrigger(trigger_departure).register();
+		departureTrigger = new Homey.FlowCardTrigger(trigger_departure).register();
 
 		// Register FlowCardAction
 		let departureAction = new Homey.FlowCardAction(action_departure);
@@ -85,43 +86,61 @@ class Skanetrafiken extends Homey.App {
 	}
 
 	getNextDeparture(from, to) {
-		return new Promise((resolve, reject) => {
-			// let tokens = {};    
-			let date = new Date(new Date().setMinutes( new Date().getMinutes() - 10 ));
+		return new Promise((resolve, reject) => { 
+			let date = new Date(new Date().setMinutes( new Date().getMinutes() - 5 )); // Minus 5 minutes
+			date = new Date(date.getTime() + (-(new Date().getTimezoneOffset())) * 60000); // Fix timezone
 			date = date.toISOString().substr(0, 16).replace('T', '%20');
-			console.log("getNextDeparture");
-			axios.get('http://www.labs.skanetrafiken.se/v2.2/resultspage.asp?cmdaction=next&selPointFr='+from.name+'|'+from.id+'|0&selPointTo='+to.name+'|'+to.id+'|0&LastStart=' + date)
+			//console.log("getNextDeparture");
+	
+			// Create api-url
+			let apiUrl = 'http://www.labs.skanetrafiken.se/v2.2/resultspage.asp?cmdaction=next&selPointFr='+from.name+'|'+from.id+'|0&selPointTo='+to.name+'|'+to.id+'|0&LastStart=' + date;
+			console.log(apiUrl);
+			axios.get(apiUrl)
 				.then(response => {
 					let xml = response.data;
-					var json = JSON.parse(convert.xml2json(xml, {
+					let json = JSON.parse(convert.xml2json(xml, {
 						compact: true,
 						spaces: 4
 					}));
-			
+					
+					// Extract journey
 					let searchResult = json["soap:Envelope"]["soap:Body"].GetJourneyResponse.GetJourneyResult.Journeys.Journey;
-			
-					let route = searchResult[0].RouteLinks.RouteLink[0];
-			
-					let diffTime = (route.RealTime.RealTimeInfo !== undefined && route.RealTime.RealTimeInfo.DepTimeDeviation._text !== '') ? route.RealTime.RealTimeInfo.DepTimeDeviation._text : 0;
-
-					let time = new Date(new Date(route.DepDateTime._text).getTime() + (-(new Date().getTimezoneOffset()) + parseInt(diffTime)) * 60000);
-			
+					
+					// Check if there is multiple routes
+					let route = "";
+					if(searchResult[0].RouteLinks.RouteLink.length > 1) {
+						route = searchResult[0].RouteLinks.RouteLink[0]
+					} else {
+						route = searchResult[0].RouteLinks.RouteLink
+					}
+	
+					// Check if there are is a realtime object
+					let diffTime = "0";
+					if(route.RealTime !== undefined && Object.keys(route.RealTime).length !== 0) {
+						diffTime =  (route.RealTime.RealTimeInfo.DepTimeDeviation._text !== '') ? route.RealTime.RealTimeInfo.DepTimeDeviation._text : "0";
+					}
+	
+					// Add diff time to departure
+					let time = new Date(route.DepDateTime._text).getTime();
+					time = new Date(new Date(time).setMinutes(new Date(time).getMinutes() + parseInt(diffTime)));
+					
+					// Build return object
 					let tokens = {
 						route_name: route.Line.Name._text,
 						next_departure: time.toLocaleTimeString().substring(0,5),
 						delayed: (diffTime > 0)
 					}
-
+	
 					console.log("Tokens", tokens);
-					console.log("departureTrigger", departureTrigger);
-					// Trigger flowcard
+					// Trigger flowcard with tokens
 					departureTrigger.trigger( tokens )
+					.then(d => console.log("departureTrigger", d))
 					.catch( this.error )
-
+	
 					resolve(true);
 				})
 				.catch(error => {
-					reject(false);
+					reject(error);
 				});
 		});
 	}

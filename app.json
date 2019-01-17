@@ -1,16 +1,16 @@
 {
   "id": "se.marcussite.skanetrafiken",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "compatibility": ">=1.5.0",
   "sdk": 2,
   "name": {
-    "en": "Skånetrafiken - Public transport information"
+    "en": "Public transport Skåne, Sweden"
   },
   "description": {
-    "en": "Public transport information in Skåne, Sweden"
+    "en": "Use this app to check when next bus/train departure from selected station"
   },
   "category": [
-    "internet"
+    "tools"
   ],
   "permissions": [],
   "images": {
