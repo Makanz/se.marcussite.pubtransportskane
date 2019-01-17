@@ -9,10 +9,10 @@ const trigger_departure = "skanetransport_trigger_next_departure";
 const action_departure = "skanetransport_find_next_departure";
 let departureTrigger = "";
 
-class Skanetrafiken extends Homey.App {
+class PubtransportSkane extends Homey.App {
 	
 	onInit() {
-		this.log('Skanetrafiken is running...')
+		this.log('Public transport Skåne is running...')
 		
 		// Register FlowCardTrigger
 		departureTrigger = new Homey.FlowCardTrigger(trigger_departure).register();
@@ -146,4 +146,4 @@ class Skanetrafiken extends Homey.App {
 	}
 }
 
-module.exports = Skanetrafiken;
+module.exports = PubtransportSkane;
