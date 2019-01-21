@@ -2,7 +2,7 @@
 
 const Homey = require('homey');
 
-const axios = require('axios');
+const fetch = require('node-fetch');
 const convert = require('xml-js');
 
 const trigger_departure = "skanetransport_trigger_next_departure";
@@ -55,49 +55,50 @@ class PubtransportSkane extends Homey.App {
 
 	stationAutoComplete(query) {
 		return new Promise((resolve, reject) => {
-			axios.get('http://www.labs.skanetrafiken.se/v2.2/querystation.asp?inpPointfr=' + encodeURIComponent(query))
-			.then(response => {
-			let xml = response.data;
-			var json = JSON.parse(convert.xml2json(xml, {
-				compact: true,
-				spaces: 4
-			}));
+			let apiUrl = 'http://www.labs.skanetrafiken.se/v2.2/querystation.asp?inpPointfr=' + encodeURIComponent(query);
+			fetch(apiUrl)
+				.then(res => res.text())
+				.then(response => {
+				let xml = response;
+				var json = JSON.parse(convert.xml2json(xml, {
+					compact: true,
+					spaces: 4
+				}));
+				
+				let searchResult = json["soap:Envelope"]["soap:Body"].GetStartEndPointResponse.GetStartEndPointResult.StartPoints.Point;
 			
-			let searchResult = json["soap:Envelope"]["soap:Body"].GetStartEndPointResponse.GetStartEndPointResult.StartPoints.Point;
-		
-			if(searchResult.length > 0) {
-				searchResult = searchResult
-									.map((busStop) => {
-										return {
-											name: busStop.Name._text,
-											id: busStop.Id._text
-										}
-									});
-				resolve(searchResult);
-			} else {
-				resolve([{name: "Nothing found!"}]);
-			}
-			
-			})
-			.catch(error => {
-				reject(error);
-			});	
+				if(searchResult.length > 0) {
+					searchResult = searchResult
+										.map((busStop) => {
+											return {
+												name: busStop.Name._text,
+												id: busStop.Id._text
+											}
+										});
+					resolve(searchResult);
+				} else {
+					resolve([{name: "Nothing found!"}]);
+				}
+				
+				})
+				.catch(error => {
+					reject(error);
+				});	
 		});
 	}
 
 	getNextDeparture(from, to) {
 		return new Promise((resolve, reject) => { 
-			let date = new Date(new Date().setMinutes( new Date().getMinutes() - 5 )); // Minus 5 minutes
-			date = new Date(date.getTime() + (-(new Date().getTimezoneOffset())) * 60000); // Fix timezone
+			let date = new Date(new Date().getTime() + (-(new Date().getTimezoneOffset())) * 60000); // Fix timezone
 			date = date.toISOString().substr(0, 16).replace('T', '%20');
-			//console.log("getNextDeparture");
 	
 			// Create api-url
 			let apiUrl = 'http://www.labs.skanetrafiken.se/v2.2/resultspage.asp?cmdaction=next&selPointFr='+from.name+'|'+from.id+'|0&selPointTo='+to.name+'|'+to.id+'|0&LastStart=' + date;
 			console.log(apiUrl);
-			axios.get(apiUrl)
+			fetch(apiUrl)
+            	.then(res => res.text())
 				.then(response => {
-					let xml = response.data;
+					let xml = response;
 					let json = JSON.parse(convert.xml2json(xml, {
 						compact: true,
 						spaces: 4

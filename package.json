@@ -1,10 +1,10 @@
 {
   "name": "se.marcussite.pubtransportskane",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Public transport Skåne, Sweden",
   "main": "app.js",
   "dependencies": {
-    "axios": "^0.18.0",
+    "node-fetch": "^2.3.0",
     "xml-js": "^1.6.9"
   },
   "devDependencies": {},
