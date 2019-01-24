@@ -78,6 +78,13 @@
             "placeholder": {
               "en": "To station..."
             }
+          },
+          {
+            "name": "departureTime",
+            "type": "string",
+            "placeholder": {
+              "en": "00:00"
+            }
           }
         ]
       }
