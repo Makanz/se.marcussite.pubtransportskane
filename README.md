@@ -7,8 +7,8 @@ http://labs.skanetrafiken.se/default.asp
 Use this app to get information about next departure for a given route.
 
 ## Supported cards
-One card in "then" column where you choose to and from stations that you want to get next departure.
-Another card to "when" to use with a "then" flow.
+One card in "then" column where you choose from and to station that you want to get next departure.
+Another card to "when" to use with multiple "then" flows.
 
 ## Tags
 The following tags are attached to the card "when"
