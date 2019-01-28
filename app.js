@@ -6,7 +6,8 @@ const fetch = require('node-fetch');
 const convert = require('xml-js');
 
 const trigger_departure = "skanetransport_trigger_next_departure";
-const action_departure = "skanetransport_find_next_departure";
+const action_next_departure = "skanetransport_find_next_departure";
+const action_check_departure = "skanetransport_check_departure";
 let departureTrigger = "";
 
 class PubtransportSkane extends Homey.App {
@@ -18,9 +19,20 @@ class PubtransportSkane extends Homey.App {
 		departureTrigger = new Homey.FlowCardTrigger(trigger_departure).register();
 
 		// Register FlowCardAction
-		let departureAction = new Homey.FlowCardAction(action_departure);
+		let departureActionNextDeparture = new Homey.FlowCardAction(action_next_departure);
 
-		departureAction
+		let departureActionCheckDeparture = new Homey.FlowCardAction(action_check_departure);
+
+		departureActionNextDeparture
+		.register()
+		.registerRunListener((args) => {
+			// Find route and get next departure
+			this.log(`Find route and get next departure: ${args.stationFrom.name} | ${args.stationFrom.id} - ${args.stationTo.name} | ${args.stationTo.id}`);			
+
+			return this.getNextDeparture(args.stationFrom, args.stationTo, new Date().toTimeString().substr(0,5));
+		})
+
+		departureActionCheckDeparture
 		.register()
 		.registerRunListener((args) => {
 			// Find route and get next departure
@@ -33,7 +45,7 @@ class PubtransportSkane extends Homey.App {
 		})
 
 		// Get arguments from "Station from" on action card
-		departureAction
+		departureActionNextDeparture
 		.getArgument('stationFrom')
 		.registerAutocompleteListener(( query, args ) => {
 				this.log(query)
@@ -44,7 +56,29 @@ class PubtransportSkane extends Homey.App {
 			})
 
 		// Get arguments from "Station to" on action card
-		departureAction
+		departureActionNextDeparture
+		.getArgument('stationTo')
+		.registerAutocompleteListener(( query, args ) => {
+				this.log(query)
+
+				if(query.length >= 3) {
+					return this.stationAutoComplete(query);
+				}
+			})
+
+		// Get arguments from "Station from" on action card
+		departureActionCheckDeparture
+		.getArgument('stationFrom')
+		.registerAutocompleteListener(( query, args ) => {
+				this.log(query)
+
+				if(query.length >= 3) {
+					return this.stationAutoComplete(query);
+				}
+			})
+
+		// Get arguments from "Station to" on action card
+		departureActionCheckDeparture
 		.getArgument('stationTo')
 		.registerAutocompleteListener(( query, args ) => {
 				this.log(query)
