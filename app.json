@@ -1,6 +1,6 @@
 {
   "id": "se.marcussite.pubtransportskane",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "compatibility": ">=1.5.0",
   "sdk": 2,
   "brandColor": "#db0623",
@@ -77,6 +77,35 @@
             "type": "autocomplete",
             "placeholder": {
               "en": "To station..."
+            }
+          }
+        ]
+      },
+      {
+        "id": "skanetransport_check_departure",
+        "title": {
+          "en": "Check departure"
+        },
+        "args": [
+          {
+            "name": "stationFrom",
+            "type": "autocomplete",
+            "placeholder": {
+              "en": "From station..."
+            }
+          },
+          {
+            "name": "stationTo",
+            "type": "autocomplete",
+            "placeholder": {
+              "en": "To station..."
+            }
+          },
+          {
+            "name": "departureTime",
+            "type": "time",
+            "placeholder": {
+              "en": "00:00"
             }
           }
         ]
