@@ -1,9 +1,5 @@
-'use strict';
-
-const Homey = require('homey');
-
-const fetch = require('node-fetch');
-const convert = require('xml-js');
+import Homey from 'homey';
+import convert from 'xml-js';
 
 const trigger_departure = "skanetransport_trigger_next_departure";
 const action_next_departure = "skanetransport_find_next_departure";
@@ -12,7 +8,7 @@ let departureTrigger = "";
 
 class PubtransportSkane extends Homey.App {
 	
-	onInit() {
+	async onInit(): Promise<void> {
 		this.log('Public transport Skåne is running...')
 		
 		// Register FlowCardTrigger
