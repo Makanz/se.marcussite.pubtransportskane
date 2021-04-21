@@ -1,0 +1,32 @@
+{
+  "id": "skanetransport_check_departure",
+  "title": {
+    "en": "Check departure"
+  },
+  "titleFormatted": {
+    "en": "Check departure [[stationFrom]] [[stationTo]] [[departureTime]]"
+  },
+  "args": [
+    {
+      "name": "stationFrom",
+      "type": "autocomplete",
+      "placeholder": {
+        "en": "From station..."
+      }
+    },
+    {
+      "name": "stationTo",
+      "type": "autocomplete",
+      "placeholder": {
+        "en": "To station..."
+      }
+    },
+    {
+      "name": "departureTime",
+      "type": "time",
+      "placeholder": {
+        "en": "00:00"
+      }
+    }
+  ]
+}

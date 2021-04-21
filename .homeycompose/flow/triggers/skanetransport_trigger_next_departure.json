@@ -1,0 +1,32 @@
+{
+  "id": "skanetransport_trigger_next_departure",
+  "title": {
+    "en": "Triggered departure"
+  },
+  "tokens": [
+    {
+      "name": "next_departure",
+      "type": "string",
+      "title": {
+        "en": "Time"
+      },
+      "example": "10:00"
+    },
+    {
+      "name": "route_name",
+      "type": "string",
+      "title": {
+        "en": "Name"
+      },
+      "example": "Bus 219"
+    },
+    {
+      "name": "delayed",
+      "type": "boolean",
+      "title": {
+        "en": "Delayed?"
+      },
+      "example": "true/false"
+    }
+  ]
+}

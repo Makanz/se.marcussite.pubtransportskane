@@ -1,0 +1,25 @@
+{
+  "id": "se.marcussite.pubtransportskane",
+  "version": "1.0.0",
+  "compatibility": ">=5.0.0",
+  "sdk": 3,
+  "brandColor": "#db0623",
+  "name": {
+    "en": "Public transport Skåne, Sweden"
+  },
+  "description": {
+    "en": "Use this app to check when next bus/train departure from selected station"
+  },
+  "category": [
+    "tools"
+  ],
+  "permissions": [],
+  "images": {
+    "large": "/assets/images/large.png",
+    "small": "/assets/images/small.png"
+  },
+  "author": {
+    "name": "Marcus Alsterfjord",
+    "email": "marcus@marcussite.se"
+  }
+}

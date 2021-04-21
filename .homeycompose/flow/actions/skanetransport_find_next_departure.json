@@ -1,0 +1,25 @@
+{
+  "id": "skanetransport_find_next_departure",
+  "title": {
+    "en": "Find departure time"
+  }, 
+  "titleFormatted": {
+    "en": "Find departure time [[stationFrom]], [[stationTo]]"
+  },
+  "args": [
+    {
+      "name": "stationFrom",
+      "type": "autocomplete",
+      "placeholder": {
+        "en": "From station..."
+      }
+    },
+    {
+      "name": "stationTo",
+      "type": "autocomplete",
+      "placeholder": {
+        "en": "To station..."
+      }
+    }
+  ]
+}
