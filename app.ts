@@ -14,64 +14,52 @@ class PubtransportSkane extends Homey.App {
 		
 		// Register FlowCardTrigger
 		this._departureTrigger = this.homey.flow.getTriggerCard(trigger_departure);
-		this._departureTrigger.registerRunListener(async (args: any, state: any) => {
-
-			this.log('Trigger args: ', args);
-			this.log('Trigger state: ', state);
-
-			// If true, this flow should run
-			return true;
-		});
 
 		// Register FlowCardAction
 		this._departureActionNextDeparture = this.homey.flow.getActionCard(action_next_departure);
-		this._departureActionCheckDeparture = this.homey.flow.getActionCard(action_check_departure);
-
 		this._departureActionNextDeparture
-		.registerRunListener(async (args: { stationFrom: { name: string; id: any; }; stationTo: { name: string; id: any; }; }) => {
+		.registerRunListener(async (args: { stationFrom: { name: string; id: string; }; stationTo: { name: string; id: string; }; }) => {
 			// Find route and get next departure
 			this.log(`Find route and get next departure: ${args.stationFrom.name} | ${args.stationFrom.id} - ${args.stationTo.name} | ${args.stationTo.id}`);			
 
 			return await this.getNextDeparture(args.stationFrom, args.stationTo, new Date().toTimeString().substr(0,5));
 		})
 
+		// Get arguments from "Station from" on action card
+		this._departureActionNextDeparture
+		.getArgument('stationFrom')
+		.registerAutocompleteListener(( query: string ) => {
+				this.log(query)
+
+				if(query.length >= 3) {
+					return this.stationAutoComplete(query);
+				}
+			})
+
+		// Get arguments from "Station to" on action card
+		this._departureActionNextDeparture
+		.getArgument('stationTo')
+		.registerAutocompleteListener(( query: string ) => {
+				this.log(query)
+
+				if(query.length >= 3) {
+					return this.stationAutoComplete(query);
+				}
+			})
+
+		this._departureActionCheckDeparture = this.homey.flow.getActionCard(action_check_departure);
 		this._departureActionCheckDeparture
-		.registerRunListener(async (args: { stationFrom: { name: string; id: any; }; stationTo: { name: string; id: any; }; departureTime: string; }) => {
+		.registerRunListener(async (args: { stationFrom: { name: string; id: string; }; stationTo: { name: string; id: string; }}) => {
 			// Find route and get next departure
 			this.log(`Find route and get next departure: ${args.stationFrom.name} | ${args.stationFrom.id} - ${args.stationTo.name} | ${args.stationTo.id}`);			
-			
-			if(!/\d\d:\d\d/g.test(args.departureTime)) // If not a valid time set time to current time
-				args.departureTime = new Date().toTimeString().substr(0,5);
 
-			return await this.getNextDeparture(args.stationFrom, args.stationTo, args.departureTime);
+			return await this.getNextDeparture(args.stationFrom, args.stationTo, '');
 		})
 
 		// Get arguments from "Station from" on action card
-		this._departureActionNextDeparture
-		.getArgument('stationFrom')
-		.registerAutocompleteListener(( query: string, args: any ) => {
-				this.log(query)
-
-				if(query.length >= 3) {
-					return this.stationAutoComplete(query);
-				}
-			})
-
-		// Get arguments from "Station to" on action card
-		this._departureActionNextDeparture
-		.getArgument('stationTo')
-		.registerAutocompleteListener(( query: string, args: any ) => {
-				this.log(query)
-
-				if(query.length >= 3) {
-					return this.stationAutoComplete(query);
-				}
-			})
-
-		// Get arguments from "Station from" on action card
 		this._departureActionCheckDeparture
 		.getArgument('stationFrom')
-		.registerAutocompleteListener(( query: string, args: any ) => {
+		.registerAutocompleteListener(( query: string ) => {
 				this.log(query)
 
 				if(query.length >= 3) {
@@ -82,7 +70,7 @@ class PubtransportSkane extends Homey.App {
 		// Get arguments from "Station to" on action card
 		this._departureActionCheckDeparture
 		.getArgument('stationTo')
-		.registerAutocompleteListener(( query: string, args: any ) => {
+		.registerAutocompleteListener(( query: string ) => {
 				this.log(query)
 
 				if(query.length >= 3) {
@@ -94,7 +82,7 @@ class PubtransportSkane extends Homey.App {
 
 	stationAutoComplete(query: string) {
 		return new Promise((resolve, reject) => {
-			let apiUrl = 'https://api.resrobot.se/location.name.json?key=54bf99d9-c02e-472c-8dd3-40c6fe37fb21&input=' + encodeURIComponent(query);
+			const apiUrl = 'https://api.resrobot.se/location.name.json?key=54bf99d9-c02e-472c-8dd3-40c6fe37fb21&input=' + encodeURIComponent(query);
 			fetch(apiUrl)
 				.then(res => res.json())
 				.then(response => {
@@ -121,42 +109,42 @@ class PubtransportSkane extends Homey.App {
 		});
 	}
 
-	async getNextDeparture(from: { name: string; id: any; }, to: { name: string; id: any; }, time: string) {
-		
-			// Create api-url
-			let apiUrl = 'https://api.resrobot.se/v2/trip?key=54bf99d9-c02e-472c-8dd3-40c6fe37fb21&originId='+from.id+'&destId='+to.id+'&format=json';
-			this.log(apiUrl);
+	async getNextDeparture(from: { name: string; id: string; }, to: { name: string; id: string; }, time: string) {
+	
+		// Create api-url
+		const apiUrl = 'https://api.resrobot.se/v2/trip?key=54bf99d9-c02e-472c-8dd3-40c6fe37fb21&originId='+from.id+'&destId='+to.id+'&format=json';
+		this.log(apiUrl);
 
-			let route = {
-				name: '',
-				time: null
-			}
+		const route = {
+			name: '',
+			time: null
+		}
 
-			await fetch(apiUrl)
-				.then(res => res.json())
-				.then(response => {
-				
-
-					response.Trip.forEach((trip: any) => {
-						let leg = trip.LegList.Leg[0];
-						if(leg.type !== 'WALK') {
-							// Build return object
-							route.name = leg.name;
-							route.time = leg.Origin.time;
-							return;
-						}
-					});
+		await fetch(apiUrl)
+			.then(res => res.json())
+			.then(response => {
+			
+				response.Trip.forEach((trip: any) => {
+					const leg = trip.LegList.Leg[0];
+					if(leg.type !== 'WALK') {
+						// Build return object
+						route.name = leg.name;
+						route.time = leg.Origin.time;
+						return;
+					}
+				});
 		});
 
-		let tokens = {
+		const tokens = {
 			route_name: route.name,
 			next_departure: route.time,
-			delayed: 0
+			delayed: false
 		}
 
 		this.log("Tokens", tokens);
+
 		// Trigger flowcard with tokens
-		await this._departureTrigger.trigger(tokens, tokens)
+		this._departureTrigger.trigger(tokens, tokens)
 		.then(this.log)
 		.catch(this.error)
 	}

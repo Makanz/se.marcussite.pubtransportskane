@@ -11,11 +11,14 @@
     "@types/homey": "npm:homey-apps-sdk-v3-types@^0.1.0",
     "@types/node": "^14.14.41",
     "@types/node-fetch": "^2.5.10",
-    "@types/source-map-support": "^0.5.3",
+    "@typescript-eslint/eslint-plugin": "^4.23.0",
+    "@typescript-eslint/parser": "^4.23.0",
+    "eslint": "^7.26.0",
     "typescript": "^4.2.4"
   },
   "scripts": {
-    "build": "tsc --build .tsconfig.json"
+    "build": "tsc",
+    "lint": "eslint . --ext .ts"
   },
   "repository": {
     "type": "git",
