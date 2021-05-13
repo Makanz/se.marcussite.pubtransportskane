@@ -1,121 +1,119 @@
 {
-  "_comment": "This file is generated. Please edit .homeycompose/app.json instead.",
-  "id": "se.marcussite.pubtransportskane",
-  "version": "1.0.0",
-  "compatibility": ">=5.0.0",
-  "sdk": 3,
-  "brandColor": "#db0623",
-  "name": {
-    "en": "Public transport Skåne, Sweden"
-  },
-  "description": {
-    "en": "Use this app to check when next bus/train departure from selected station"
-  },
-  "category": [
-    "tools"
-  ],
-  "permissions": [],
-  "images": {
-    "large": "/assets/images/large.png",
-    "small": "/assets/images/small.png"
-  },
-  "author": {
-    "name": "Marcus Alsterfjord",
-    "email": "marcus@marcussite.se"
-  },
-  "flow": {
-    "triggers": [
-      {
-        "id": "skanetransport_trigger_next_departure",
-        "title": {
-          "en": "Triggered departure"
-        },
-        "tokens": [
-          {
-            "name": "next_departure",
-            "type": "string",
-            "title": {
-              "en": "Time"
+    "_comment": "This file is generated. Please edit .homeycompose/app.json instead.",
+    "id": "se.marcussite.pubtransportskane",
+    "version": "1.0.0",
+    "compatibility": ">=5.0.0",
+    "sdk": 3,
+    "brandColor": "#db0623",
+    "name": {
+        "en": "Public transport Skåne, Sweden"
+    },
+    "description": {
+        "en": "Use this app to check when next bus/train departure from selected station"
+    },
+    "category": ["tools"],
+    "permissions": [],
+    "images": {
+        "large": "/assets/images/large.png",
+        "small": "/assets/images/small.png"
+    },
+    "author": {
+        "name": "Marcus Alsterfjord",
+        "email": "marcus@marcussite.se"
+    },
+    "flow": {
+        "triggers": [
+            {
+                "id": "skanetransport_trigger_next_departure",
+                "title": {
+                    "en": "Triggered departure"
+                },
+                "tokens": [
+                    {
+                        "name": "next_departure",
+                        "type": "string",
+                        "title": {
+                            "en": "Time"
+                        },
+                        "example": "10:00"
+                    },
+                    {
+                        "name": "route_name",
+                        "type": "string",
+                        "title": {
+                            "en": "Name"
+                        },
+                        "example": "Bus 219"
+                    },
+                    {
+                        "name": "delayed",
+                        "type": "boolean",
+                        "title": {
+                            "en": "Delayed?"
+                        },
+                        "example": "true/false"
+                    }
+                ]
+            }
+        ],
+        "actions": [
+            {
+                "id": "skanetransport_check_departure",
+                "title": {
+                    "en": "Check departure"
+                },
+                "titleFormatted": {
+                    "en": "Check departure [[stationFrom]] [[stationTo]] [[departureTime]]"
+                },
+                "args": [
+                    {
+                        "name": "stationFrom",
+                        "type": "autocomplete",
+                        "placeholder": {
+                            "en": "From station..."
+                        }
+                    },
+                    {
+                        "name": "stationTo",
+                        "type": "autocomplete",
+                        "placeholder": {
+                            "en": "To station..."
+                        }
+                    },
+                    {
+                        "name": "departureTime",
+                        "type": "time",
+                        "placeholder": {
+                            "en": "00:00"
+                        }
+                    }
+                ]
             },
-            "example": "10:00"
-          },
-          {
-            "name": "route_name",
-            "type": "string",
-            "title": {
-              "en": "Name"
-            },
-            "example": "Bus 219"
-          },
-          {
-            "name": "delayed",
-            "type": "boolean",
-            "title": {
-              "en": "Delayed?"
-            },
-            "example": "true/false"
-          }
+            {
+                "id": "skanetransport_find_next_departure",
+                "title": {
+                    "en": "Find departure time"
+                },
+                "titleFormatted": {
+                    "en": "Find departure time [[stationFrom]], [[stationTo]]"
+                },
+                "args": [
+                    {
+                        "name": "stationFrom",
+                        "type": "autocomplete",
+                        "placeholder": {
+                            "en": "From station..."
+                        }
+                    },
+                    {
+                        "name": "stationTo",
+                        "type": "autocomplete",
+                        "placeholder": {
+                            "en": "To station..."
+                        }
+                    }
+                ]
+            }
         ]
-      }
-    ],
-    "actions": [
-      {
-        "id": "skanetransport_check_departure",
-        "title": {
-          "en": "Check departure"
-        },
-        "titleFormatted": {
-          "en": "Check departure [[stationFrom]] [[stationTo]] [[departureTime]]"
-        },
-        "args": [
-          {
-            "name": "stationFrom",
-            "type": "autocomplete",
-            "placeholder": {
-              "en": "From station..."
-            }
-          },
-          {
-            "name": "stationTo",
-            "type": "autocomplete",
-            "placeholder": {
-              "en": "To station..."
-            }
-          },
-          {
-            "name": "departureTime",
-            "type": "time",
-            "placeholder": {
-              "en": "00:00"
-            }
-          }
-        ]
-      },
-      {
-        "id": "skanetransport_find_next_departure",
-        "title": {
-          "en": "Find departure time"
-        },
-        "titleFormatted": {
-          "en": "Find departure time [[stationFrom]], [[stationTo]]"
-        },
-        "args": [
-          {
-            "name": "stationFrom",
-            "type": "autocomplete",
-            "placeholder": {
-              "en": "From station..."
-            }
-          },
-          {
-            "name": "stationTo",
-            "type": "autocomplete",
-            "placeholder": {
-              "en": "To station..."
-            }
-          }
-        ]
-      }
-    ]
-  }
+    }
 }
