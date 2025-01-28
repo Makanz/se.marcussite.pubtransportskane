@@ -4,8 +4,8 @@
   "description": "Public transport Skåne, Sweden",
   "main": "app.js",
   "dependencies": {
-    "node-fetch": "^2.6.7",
-    "xml-js": "^1.6.9"
+    "node-fetch": "^3.3.2",
+    "xml-js": "^1.6.11"
   },
   "devDependencies": {},
   "scripts": {
